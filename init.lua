@@ -1,29 +1,21 @@
+-- [[ Setting options ]]
+-- See `:help vim.opt`
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.opt.guicursor = ''
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
 vim.g.netrw_liststyle = 3
-
-vim.g.have_nerd_font = true
-
--- [[ Setting options ]]
--- See `:help vim.opt`
--- NOTE: You can change these options as you wish!
---  For more options, you can see `:help option-list`
-
--- Make line numbers default
-vim.opt.number = true
--- You can also add relative line numbers, to help with jumping.
---  Experiment for yourself to see if you like it!
+vim.g.netrw_banner = 0
 vim.opt.relativenumber = true
 
+vim.g.have_nerd_font = true
+-- Make line numbers default
+vim.opt.number = true
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
-
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
-
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -31,27 +23,20 @@ vim.opt.showmode = false
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
 end)
-
 -- Enable break indent
 vim.opt.breakindent = true
-
 -- Save undo history
 vim.opt.undofile = true
-
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-
 -- Keep signcolumn on by default [yes]
 vim.opt.signcolumn = 'no'
-
 -- Decrease update time
 vim.opt.updatetime = 250
-
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
 vim.opt.timeoutlen = 300
-
 -- Configure how new splits should be opened
 vim.opt.splitright = true
 vim.opt.splitbelow = true
@@ -103,8 +88,9 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<leader>pv', vim.cmd.Ex, { desc = '[P]revious [V]iew' })
+vim.keymap.set('n', '<leader>pf', '<C-^>', { desc = '[P]revious [F]ile' })
 
-vim.keymap.set('n', '<leader>pv', vim.cmd.Ex)
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 -- [[ Basic Autocommands ]]
@@ -172,7 +158,35 @@ require('lazy').setup({
       },
     },
   },
-
+  {
+    'tamton-aquib/duck.nvim',
+    config = function()
+      vim.keymap.set('n', '<leader>dd', function()
+        require('duck').hatch()
+      end, {})
+      vim.keymap.set('n', '<leader>dr', function()
+        require('duck').hatch('🦀', 10)
+      end, {})
+      vim.keymap.set('n', '<leader>dk', function()
+        require('duck').cook()
+      end, {})
+      vim.keymap.set('n', '<leader>da', function()
+        require('duck').cook_all()
+      end, {})
+    end,
+  },
+  {
+    'goolord/alpha-nvim',
+    -- dependencies = { 'echasnovski/mini.icons' },
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      local startify = require 'alpha.themes.startify'
+      -- available: devicons, mini, default is mini
+      -- if provider not loaded and enabled is true, it will try to use another provider
+      startify.file_icons.provider = 'devicons'
+      require('alpha').setup(startify.config)
+    end,
+  },
   {
     'christoomey/vim-tmux-navigator',
     cmd = {
@@ -254,6 +268,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
+        { '<leader>p', group = '[P]revious' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
     },
@@ -587,6 +602,22 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- local border = {
+      --   { '┌', 'FloatBorder' },
+      --   { '─', 'FloatBorder' },
+      --   { '┐', 'FloatBorder' },
+      --   { '│', 'FloatBorder' },
+      --   { '┘', 'FloatBorder' },
+      --   { '─', 'FloatBorder' },
+      --   { '└', 'FloatBorder' },
+      --   { '│', 'FloatBorder' },
+      -- }
+      -- WARNING: HERE WAS CHANGED
+      local orig_hover = vim.lsp.handlers['textDocument/hover']
+      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(orig_hover, {
+        border = 'rounded', -- Options: 'none', 'single', 'double', 'rounded', 'solid', 'shadow'
+      })
+      -- WARNING: HERE WAS CHANGED
       require('mason-lspconfig').setup {
         { PATH = 'append' },
         handlers = {
@@ -598,6 +629,7 @@ require('lazy').setup({
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig').rust_analyzer.setup {
               cmd = { '/sgoinfre/oohnivch/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rust-analyzer' },
+              -- handlers = handlers,
               settings = {
                 ['rust-analyzer'] = {
                   diagnostics = {
