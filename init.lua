@@ -636,12 +636,14 @@ require('lazy').setup(
                   },
                 },
               }
-              local cmp_nvim_lsp = require 'cmp_nvim_lsp'
+              -- local cmp_nvim_lsp = require 'cmp_nvim_lsp'
               require('lspconfig').clangd.setup {
-                capabilities = cmp_nvim_lsp.default_capabilities(),
+                capabilities = {
+                  offsetEncoding = { 'utf-16' },
+                },
                 cmd = {
                   'clangd',
-                  '--offset-encoding=utf-16',
+                  -- '--offset-encoding=utf-16',
                 },
               }
               require('lspconfig')[server_name].setup(server)
