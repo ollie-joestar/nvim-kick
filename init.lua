@@ -599,7 +599,8 @@ require('lazy').setup(
         })
         require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-        -- local border = {
+        -- local border =
+        -- {
         --   { '┌', 'FloatBorder' },
         --   { '─', 'FloatBorder' },
         --   { '┐', 'FloatBorder' },
@@ -633,6 +634,14 @@ require('lazy').setup(
                       enable = false,
                     },
                   },
+                },
+              }
+              local cmp_nvim_lsp = require 'cmp_nvim_lsp'
+              require('lspconfig').clangd.setup {
+                capabilities = cmp_nvim_lsp.default_capabilities(),
+                cmd = {
+                  'clangd',
+                  '--offset-encoding=utf-16',
                 },
               }
               require('lspconfig')[server_name].setup(server)
